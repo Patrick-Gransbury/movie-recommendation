@@ -145,10 +145,18 @@ def recommend(movie):
 
 @app.route('/recommend', methods=['POST'])
 def get_recommendations():
-    data = request.get_json()
-    movie = data['movie']
-    recommendations = recommend(movie)
-    return jsonify(recommendations)
+    try:
+        data = request.get_json()
+        movie = data.get('movie')
+        if not movie:
+            return jsonify({'error': 'Please provide a valid movie title.'}), 400
+        
+        recommendations = recommend(movie)
+        if not recommendations:
+            return jsonify({'error': 'Movie not found in the dataset.'}), 404
+        return jsonify(recommendations)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
